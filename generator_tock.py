@@ -1,8 +1,8 @@
-import random
+ï»¿import random
 import matplotlib.pyplot as plt
 
 ### Najprej uvozimo potrebne pakete
-### Definiramo funckijo, ki nam nakljuèno doloèi koordinate toèk
+### Definiramo funckijo, ki nam nakljuÄno doloÄi koordinate toÄk
 
 def koordinate_tocke():
     x = random.uniform(0, 1)
@@ -10,7 +10,7 @@ def koordinate_tocke():
     status = 0
     return [x,y,status]
 
-### Definiramo funkcijo, ki nariše toèke
+### Definiramo funkcijo, ki nariÅ¡e toÄke
 
 def narisi_tocke(n,tocke,list):
     okuzene_tocke = list
@@ -23,7 +23,7 @@ def narisi_tocke(n,tocke,list):
             plt.plot(x, y, 'o', color="black")
     return plt.show()
 
-### Definiramo funckijo, ki nam zgenerira n toèk, in jih nariše
+### Definiramo funckijo, ki nam zgenerira n toÄk, in jih nariÅ¡e
 
 def generiraj_n_tock(n):
     prva_tocka = koordinate_tocke()
@@ -42,7 +42,7 @@ def generiraj_n_tock(n):
 #a = koordinate_tocke()
 b = generiraj_n_tock(200)
 
-# pogledamo katera toèka je okuena
+# pogledamo katera toÄka je okuÅ¾ena
 xcx = 0
 for i in range(0,len(b)):
     tocka = b["{}".format(i)][2]
