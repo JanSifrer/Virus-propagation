@@ -3,16 +3,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 ### Najprej uvozimo potrebne pakete
-### Definiramo funckijo, ki nam naključno določi koordinate točk
+### Definiramo funckijo, ki nam nakljucno doloci koordinate tock
 
 def koordinate_tocke():
     x = random.uniform(0, 1)
     y = random.uniform(0, 1)
     status = 0
-    kolikokarat_sosed = 0
-    return [x,y,status,kolikokarat_sosed]
+    return [x,y,status]
 
-### Definiramo funckijo, ki nam zgenerira n točk
+### Definiramo funckijo, ki nam zgenerira n tock
 
 def generiraj_n_tock(n):
     prva_tocka = koordinate_tocke()
@@ -22,59 +21,51 @@ def generiraj_n_tock(n):
         tocke.update({"{}".format(i):koordinate})
     return tocke
 
-### Definiramo funkcijo, ki nariše točke
-def cas_kuznosti(tocka_ki_nas_zanima, tocke):
-    cas = tocke["{}".format(int(tocka_ki_nas_zanima))][2]
-    return cas
-
-
-
+### Definiramo funkcijo, ki nam ustvari slovar sosedov, 
+### pogledamo najprej ali je kandidat sosed od neke dolocene tocke,
+### ce je, dodamo to tocko v seznam sosedov od kandidata.
 def ali_je_sosed(kandidat, tocka, tocke, radij, dict_sosedov):
     x_tocke = tocke["{}".format(tocka)][0]
     y_tocke = tocke["{}".format(tocka)][1]
     x_kandidat = tocke["{}".format(kandidat)][0]
     y_kandidat = tocke["{}".format(kandidat)][1]
     if (x_kandidat-x_tocke)**2 + (y_kandidat-y_tocke)**2 < radij**2:
-        tocke["{}".format(kandidat)][3] += 1
         if tocka in dict_sosedov["{}".format(kandidat)]:
             pass
         else:
             dict_sosedov["{}".format(kandidat)] += [tocka]
-    return tocke, dict_sosedov
+    return dict_sosedov
 
-
+### Dolocimo funckijo, ki nam narise tocke
 def za_risanje_tock(n,tocke, radij, dict_sosedov):
-    #figure, axes = plt.subplots()
+    steviloo = 0
     for j in range(0,n):
         x = tocke["{}".format(j)][0]
         y = tocke["{}".format(j)][1]
         if tocke["{}".format(j)][2] > 0:
-            #krog = plt.Circle((x, y), radij, color='r', fill=False)
             plt.plot(x, y, 'o', color="red")
-            #axes.add_artist(krog)
+            steviloo +=1
         else:
-            #for i in kuzne_tocke:
-            #tocke = ali_je_sosed(j, i ,tocke, radij)
             if len(dict_sosedov["{}".format(j)]) > 0:
                 plt.plot(x, y, 'o', color="green")
             else:
                 plt.plot(x, y, 'o', color="black")
-    #axes.add_artist(krog)
+    print("stevilo narisanih je: {}".format(steviloo))
     plt.show()
 
-def dodaj_okuzeno_tocko(novo_okuzena_tocka, tocke, koliko_dni_bo_kuzna):
-    tocke["{}".format(novo_okuzena_tocka)][2] = koliko_dni_bo_kuzna
-    return tocke
-
 def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
+    ### Najprej dediniram slovar sosedov, in zapisem, da nobena tocka ni sosed od kere okuzene
     dict_sosedov = {}
     for i in range(0,n):
         dict_sosedov.update({"{}".format(i):[]})
     for i in range(0,m):
+        ### Izberem neko nakljucno okuzeno tocko, in nastavim da bo kuzna se T-1 dni 
         okuzena_tocka = random.randrange(n)
-        tocke = dodaj_okuzeno_tocko(okuzena_tocka, tocke, T)
+        tocke["{}".format(okuzena_tocka)][2] = T
         for j in range(0,n):
-            tocke, dict_sosedov = ali_je_sosed(j, okuzena_tocka, tocke, radij, dict_sosedov)
+            ### Za vse tocke preverim, ali so sosedi okuzene tocke
+            dict_sosedov = ali_je_sosed(j, okuzena_tocka, tocke, radij, dict_sosedov)
+    ### Narisem prvo stanje
     za_risanje_tock(n, tocke, radij, dict_sosedov)
     return tocke, dict_sosedov
 
@@ -85,26 +76,52 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
     while max_st_ponovitev > 0:
         max_st_ponovitev -= 1
         koraki += 1
-        print(koraki)
+        #print(koraki)
         for i in range(0,n):
+            ### Najpprej preverimo, ce je sosed od kaksne okuzene tocke, in ce je, od koliko tock je sosed
             kolikokart_sosed = len(dict_sosedov["{}".format(i)])
             if kolikokart_sosed > 0:
+                ### Toliko kolikor ima okuzenih sosedov, tolikokrat je lahko z doloceno verjetnostjo okuzen
                 ali_se_okuzi = np.random.binomial(size=kolikokart_sosed, n=1, p=verjetnost)
                 ali_se_okuzi = max(ali_se_okuzi)
                 if ali_se_okuzi > 0:
-                    tocke = dodaj_okuzeno_tocko(i, tocke, T)
+                    ### Ce se okuzi, nastavimo cas kuznosti na T+1 (T je cas kuznosti, +1 pa mi v naslednji dveh 
+                    ### for zankah omogoca, da popravim sosede od nje...)
+                    tocke["{}".format(i)][2] = T+1
+        steviloo = 0
         for h in range(0,n):
+            ### Za vsako tocko pogledamo koliko dni bo se kuzna, ce ni kuzna, vrne 0
             stevilo = tocke["{}".format(h)][2]
             if stevilo > 0:
                 for j in range(0,n):
-                    tocke, dict_sosedov = ali_je_sosed(j, h, tocke, radij, dict_sosedov)
+                    if stevilo > 1:
+                        ### Ce bo tocka okuzena se vec kakor 1 dan, potem za vse druge tocke pogledam,
+                        ### ce je soseda od okuzene tocke
+                        dict_sosedov = ali_je_sosed(j, h, tocke, radij, dict_sosedov)
                     if stevilo == 1:
+                        ### Če je to zadnji dan, ko je oseba se kuzna, popravimo seznam sosedov,
+                        ### kajti ta tocka (j) ne bo vec soseda od okuzene tocke (h)
                         try:
                             dict_sosedov["{}".format(j)].remove(h)
                         except:
                             pass
+                ### Na koncu se popravimo, koliko dni bo se kuzna.
                 tocke["{}".format(h)][2] -= 1
-        za_risanje_tock(n, tocke, radij, dict_sosedov)
+            if stevilo > 1:
+                steviloo +=1
+        ### Narisemo stanje 
+        if koraki % 100 == 0:
+            za_risanje_tock(n, tocke, radij, dict_sosedov)
+            print("Stevilo po {} korakih".format(koraki))
+        if koraki % 10 == 0:
+            print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
+        if steviloo/n == 1:
+            print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
+            print("Delez okuzenih je: {}".format(steviloo/n))
+            break
+        if steviloo/n == 0:
+            print("stevilo okuzenih je 0, prislo je do koraka {}".format(koraki))
+            break
     return tocke
             
 
@@ -117,16 +134,7 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
 ### TESTI
 #narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
 #b = narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
-#c=b[1]
-##a = b[2]
-#b=b[0]
 #
-b = okuzi_sosede(200, 1, 0.1, 3, 8,0.2)
-#
-## pogledamo katera točka je okužena
-#xcx = 0
-#for i in range(0,len(b)):
-#    tocka = b["{}".format(i)][2]
-#    if tocka > 0:
-#        print(i, b["{}".format(i)])
+b = okuzi_sosede(2000, 1, 0.01, 14, 200, 0.05)
+
 
