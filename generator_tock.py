@@ -1,6 +1,7 @@
 ﻿import random
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 ### Najprej uvozimo potrebne pakete
 ### Definiramo funckijo, ki nam nakljucno doloci koordinate tock
@@ -38,7 +39,7 @@ def ali_je_sosed(kandidat, tocka, tocke, radij, dict_sosedov):
     return dict_sosedov
 
 ### Dolocimo funckijo, ki nam narise tocke
-def za_risanje_tock(n,tocke, radij, dict_sosedov):
+def za_risanje_tock(n,tocke, dict_sosedov, korak_slike):
     for j in range(0,n):
         x = tocke["{}".format(j)][0]
         y = tocke["{}".format(j)][1]
@@ -52,7 +53,9 @@ def za_risanje_tock(n,tocke, radij, dict_sosedov):
                     plt.plot(x, y, 'o', color="green")
                 else:
                     plt.plot(x, y, 'o', color="black")
+    plt.suptitle("slika na {} koraku".format(korak_slike))
     plt.show()
+    #c.show()
 
 def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
     ### Najprej dediniram slovar sosedov, in zapisem, da nobena tocka ni sosed od kere okuzene
@@ -67,10 +70,10 @@ def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
             ### Za vse tocke preverim, ali so sosedi okuzene tocke
             dict_sosedov = ali_je_sosed(j, okuzena_tocka, tocke, radij, dict_sosedov)
     ### Narisem prvo stanje
-    #za_risanje_tock(n, tocke, radij, dict_sosedov)
+    za_risanje_tock(n, tocke, dict_sosedov, 1)
     return tocke, dict_sosedov
 
-def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, radij):
+def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, radij, koraki_do_slike):
     tocke = generiraj_n_tock(n)
     tocke, dict_sosedov = narisi_m_okuzenih_tock(n, koliko_zacetnih_okuzenih, tocke, T, radij)
     koraki = 0
@@ -122,19 +125,17 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
             else:
                 preboleli += 1
         ### Narisemo stanje 
-        #if koraki % 100 == 0:
-
-            #za_risanje_tock(n, tocke, radij, dict_sosedov)
-        if koraki % 10 == 0:
+        if koraki % koraki_do_slike == 0:
             print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
+            za_risanje_tock(n, tocke, dict_sosedov, koraki)
         if (steviloo)/n == 1:
             print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
             print("Delez okuzenih je: {}".format(steviloo/n))
-            za_risanje_tock(n, tocke, radij, dict_sosedov)
+            za_risanje_tock(n, tocke, dict_sosedov, koraki)
             break
         if (steviloo)/n == 0:
             print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
-            za_risanje_tock(n, tocke, radij, dict_sosedov)
+            za_risanje_tock(n, tocke, dict_sosedov, koraki)
             break
     return tocke
             
@@ -149,9 +150,9 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
 #narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
 #b = narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
 #
-b = okuzi_sosede(2000, 1, 0.01, 14, 1000, 0.05)
+#b = okuzi_sosede(2000, 1, 0.01, 14, 1000, 0.05)
 countt = 0
-for i in b:
-    if b["{}".format(i)][3] == 0:
-        countt +=1
-        #print(i)
+#for i in b:
+#    if b["{}".format(i)][3] == 0:
+#        countt +=1
+#        #print(i)
