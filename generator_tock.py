@@ -128,6 +128,8 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
         if koraki % koraki_do_slike == 0:
             print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
             za_risanje_tock(n, tocke, dict_sosedov, koraki)
+        if koraki % 10 == 0:
+            print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
         if (steviloo)/n == 1:
             print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
             print("Delez okuzenih je: {}".format(steviloo/n))
