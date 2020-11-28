@@ -3,6 +3,7 @@ import hashlib
 from datetime import date
 from generator_tock import *
 from decimal import *
+import os
 
 
 #Privzete nastavitve
