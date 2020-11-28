@@ -9,19 +9,9 @@ from decimal import *
 SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/')
-DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 
 # Odkomentiraj, če želiš sporočila o napakah
 debug(True)  # za izpise pri razvoju
-
-# Mapa za statične vire (slike, css, ...)
-static_dir = "./static"
-
-skrivnost = 'safnju134839safqwr'
-
-@route("/static/<filename:path>")
-def static(filename):
-    return static_file(filename, root=static_dir)
 
 @get('/')
 def index():
