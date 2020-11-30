@@ -34,8 +34,8 @@ def podatki_post():
     zacetne=int(zacetne)
     #tocke = generiraj_n_tock(tocke_za_simulacijo)
     #narisi_m_okuzenih_tock(tocke_za_simulacijo, zacetne, tocke, cas, radij)
-    okuzi_sosede(tocke_za_simulacijo, zacetne, verjetnost, cas, 1000, radij, koraki)
-    redirect('/')
+    okuzi_sosede(tocke_za_simulacijo, zacetne, verjetnost, cas, 1000, radij, koraki, True)
+    redirect('{}'.format(ROOT))
 
 
 # reloader=True nam olajša razvoj (ozveževanje sproti - razvoj)
