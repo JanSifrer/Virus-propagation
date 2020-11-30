@@ -11,12 +11,18 @@ SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/')
 
+def rtemplate(*largs, **kwargs):
+    """
+    Izpis predloge s podajanjem spremenljivke ROOT z osnovnim URL-jem.
+    """
+    return template(ROOT=ROOT, *largs, **kwargs)
+
 # Odkomentiraj, če želiš sporočila o napakah
 debug(True)  # za izpise pri razvoju
 
 @get('/')
 def index():
-    return template('zacetna.html')
+    return rtemplate('zacetna.html')
 
 @post('/podatki')
 def podatki_post():
