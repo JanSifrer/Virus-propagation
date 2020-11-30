@@ -149,22 +149,23 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
     return (steviloo, preboleli, koraki)
             
 def generiraj():
-    verjetnost = 0.01
-    radij = 0.05
+    verjetnost = 0.02
+    radij = 0.02
     datoteka = "generirani_podatki.csv"
     with open(datoteka, 'a', newline='') as data:
         writer = csv.DictWriter(data, fieldnames =["Verjetnost", "Radij", "Okuženi", "Preboleli", "Koraki"])
         writer.writeheader()
-    while radij < 0.2:
-        radij += 0.05
-        while verjetnost < 0.1:
-            verjetnost += 0.01
-            for i in range(0,1):
+    for j in range(0,4):
+        radij = 0.02 + j*0.02
+        for h in range(0, 5):
+            verjetnost = 0.02 + h*0.02
+            for i in range(0,100):
                 steviloo, preboleli, koraki = okuzi_sosede(2000, 1, verjetnost, 14, 1000, radij,1)
-                print(steviloo, preboleli, koraki)
+                print(i, radij, verjetnost, steviloo, preboleli, koraki)
                 with open(datoteka, 'a', newline='') as data:
                     writer = csv.DictWriter(data, fieldnames =["Verjetnost", "Radij", "Okuženi", "Preboleli", "Koraki"])
                     writer.writerow({"Verjetnost":"{0}".format(verjetnost), "Radij":"{0}".format(radij), "Okuženi": "{0}".format(steviloo), "Preboleli": "{0}".format(preboleli), "Koraki": "{0}".format(koraki)})
+
 
 
 
