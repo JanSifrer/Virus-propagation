@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import csv
+import os.path
 
 ### Najprej uvozimo potrebne pakete
 ### Definiramo funckijo, ki nam nakljucno doloci koordinate tock
@@ -70,7 +72,7 @@ def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
             ### Za vse tocke preverim, ali so sosedi okuzene tocke
             dict_sosedov = ali_je_sosed(j, okuzena_tocka, tocke, radij, dict_sosedov)
     ### Narisem prvo stanje
-    za_risanje_tock(n, tocke, dict_sosedov, 1)
+    #za_risanje_tock(n, tocke, dict_sosedov, 1)
     return tocke, dict_sosedov
 
 def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, radij, koraki_do_slike):
@@ -118,29 +120,51 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
 
                     ### Na koncu se popravimo, koliko dni bo se kuzna.
                     tocke["{}".format(h)][2] -= 1
+                ### Na steviloo nam šteje število okuženih točk
                 if stevilo > 1:
                     steviloo +=1
+                ### Preboleli je število prebolelih
                 if stevilo == 1:
                     preboleli += 1
             else:
                 preboleli += 1
         ### Narisemo stanje 
-        if koraki % koraki_do_slike == 0:
-            print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
-            za_risanje_tock(n, tocke, dict_sosedov, koraki)
-        if koraki % 10 == 0:
-            print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
+        #if koraki % koraki_do_slike == 0:
+        #    print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
+        #    za_risanje_tock(n, tocke, dict_sosedov, koraki)
+        #if koraki % 10 == 0:
+        #    print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
         if (steviloo)/n == 1:
-            print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
-            print("Delez okuzenih je: {}".format(steviloo/n))
-            za_risanje_tock(n, tocke, dict_sosedov, koraki)
-            break
+            #print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, steviloo))
+            #print("Delez okuzenih je: {}".format(steviloo/n))
+            #za_risanje_tock(n, tocke, dict_sosedov, koraki)
+            #break
+            return (steviloo, preboleli, koraki)
         if (steviloo)/n == 0:
-            print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
-            za_risanje_tock(n, tocke, dict_sosedov, koraki)
-            break
-    return tocke
+            #print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, steviloo, preboleli))
+            #za_risanje_tock(n, tocke, dict_sosedov, koraki)
+            #break
+            return (steviloo, preboleli, koraki)
+    #return tocke
+    return (steviloo, preboleli, koraki)
             
+def generiraj():
+    verjetnost = 0.01
+    radij = 0.05
+    datoteka = "generirani_podatki.csv"
+    with open(datoteka, 'a', newline='') as data:
+        writer = csv.DictWriter(data, fieldnames =["Verjetnost", "Radij", "Okuženi", "Preboleli", "Koraki"])
+        writer.writeheader()
+    while radij < 0.2:
+        radij += 0.05
+        while verjetnost < 0.1:
+            verjetnost += 0.01
+            for i in range(0,1):
+                steviloo, preboleli, koraki = okuzi_sosede(2000, 1, verjetnost, 14, 1000, radij,1)
+                print(steviloo, preboleli, koraki)
+                with open(datoteka, 'a', newline='') as data:
+                    writer = csv.DictWriter(data, fieldnames =["Verjetnost", "Radij", "Okuženi", "Preboleli", "Koraki"])
+                    writer.writerow({"Verjetnost":"{0}".format(verjetnost), "Radij":"{0}".format(radij), "Okuženi": "{0}".format(steviloo), "Preboleli": "{0}".format(preboleli), "Koraki": "{0}".format(koraki)})
 
 
 
@@ -153,7 +177,7 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
 #b = narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
 #
 #b = okuzi_sosede(2000, 1, 0.01, 14, 1000, 0.05)
-countt = 0
+#countt = 0
 #for i in b:
 #    if b["{}".format(i)][3] == 0:
 #        countt +=1
