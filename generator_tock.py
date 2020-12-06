@@ -40,6 +40,7 @@ def ali_je_sosed(kandidat, tocka, tocke, radij, dict_sosedov):
 
 ### Dolocimo funckijo, ki nam narise tocke
 def za_risanje_tock(n,tocke, dict_sosedov, korak_slike, ze_poznane_slike):
+    plt.clf()
     for k, (x, y, koliko_dni_se_kuzna, ze_prebolela) in tocke.items():
         if ze_prebolela == 1:
             plt.plot(x, y, 'o', color="blue")
