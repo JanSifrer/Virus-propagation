@@ -1,10 +1,8 @@
 from bottle import *
-import hashlib
-from datetime import date
 from generator_tock import *
 from decimal import *
 import os
-
+import urllib
 
 #Privzete nastavitve
 SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
@@ -22,7 +20,7 @@ debug(True)  # za izpise pri razvoju
 
 @get('/')
 def index():
-    return rtemplate('zacetna.html')
+    return rtemplate('zacetna.html', data = [])
 
 @post('/podatki')
 def podatki_post():
@@ -39,9 +37,10 @@ def podatki_post():
     zacetne = request.forms.zacetne
     zacetne=int(zacetne)
     #tocke = generiraj_n_tock(tocke_za_simulacijo)
-    #narisi_m_okuzenih_tock(tocke_za_simulacijo, zacetne, tocke, cas, radij)
-    okuzi_sosede(tocke_za_simulacijo, zacetne, verjetnost, cas, 1000, radij, koraki, True)
-    redirect('{}'.format(ROOT))
+    #a,b,ze_poznane_slike = narisi_m_okuzenih_tock(tocke_za_simulacijo, zacetne, tocke, cas, radij)
+    ze_poznane_slike = okuzi_sosede(tocke_za_simulacijo, zacetne, verjetnost, cas, 1000, radij, koraki, True)
+    return rtemplate('zacetna.html', data=ze_poznane_slike)
+
 
 
 # reloader=True nam olajša razvoj (ozveževanje sproti - razvoj)

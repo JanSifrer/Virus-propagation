@@ -13,70 +13,82 @@
 <div class="container">
   <h2>Dobrodošli na simulaciji širjenja virusa</h2>
   <div class="btn-group">
-    <form action="{{ROOT}}podatki" method="post">
-        <table>
-            <tr>
-                <th></th>
-                <th>
-                    <p>Vpišite ustrezne podatke:</p>
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Verjetnost prenosa okužbe</p>
-                </th>
-                <th>
-                    <input name="verjetnost" type="number" step="0.001", value="0.05">
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Čas trajanja okužbe</p>
-                </th>
-                <th>
-                    <input name="cas" type="integer", value="14">
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Razdaljo do soseda</p>
-                </th>
-                <th>
-                    <input name="radij" type="number", step="0.01", value="0.1">
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Na koliko korakov želite sliko</p>
-                </th>
-                <th>
-                    <input name="koraki" type="integer", value="10">
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Število točk za simulacijo</p>
-                </th>
-                <th>
-                    <input name="tocke_za_simulacijo" type="integer", value="2000">
-                </th>
-            </tr>
-            <tr>
-                <th>
-                    <p>Število začetno okuženih</p>
-                </th>
-                <th>
-                    <input name="zacetne" type="integer", value="1">
-                </th>
-            </tr>
-            <tr>
-                <th></th>
-                <th>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" >Potrdi</button>
-                </th>
-            </tr>
-    </form>
+      %if data == []:
+        <form action="{{ROOT}}podatki" method="post">
+            <table>
+                <tr>
+                    <th></th>
+                    <th>
+                        <p>Vpišite ustrezne podatke:</p>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Verjetnost prenosa okužbe</p>
+                    </th>
+                    <th>
+                        <input name="verjetnost" type="number" step="0.001", value="0.05">
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Čas trajanja okužbe</p>
+                    </th>
+                    <th>
+                        <input name="cas" type="integer", value="14">
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Razdaljo do soseda</p>
+                    </th>
+                    <th>
+                        <input name="radij" type="number", step="0.01", value="0.1">
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Na koliko korakov želite sliko</p>
+                    </th>
+                    <th>
+                        <input name="koraki" type="integer", value="10">
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Število točk za simulacijo</p>
+                    </th>
+                    <th>
+                        <input name="tocke_za_simulacijo" type="integer", value="2000">
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Število začetno okuženih</p>
+                    </th>
+                    <th>
+                        <input name="zacetne" type="integer", value="1">
+                    </th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" >Potrdi</button>
+                    </th>
+                </tr>
+        </form>
+    %else:
+        %for i,v in data.items():
+            <div class="row">
+            <img src="{{v}}" />
+            </div>
+        %end
+        <div class="row">
+            <a href="{{ROOT}}"  class="button btn btn-primary" style="margin-top: 1rem;" >Vrni se nazaj</a>
+        </div>
+    %end
   </div>
 </div>
+
 </body>
 </html>
