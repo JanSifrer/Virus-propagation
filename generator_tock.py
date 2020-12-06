@@ -1,9 +1,9 @@
 ﻿import random
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 import csv
 import os.path
+import io, urllib, base64
 
 ### Najprej uvozimo potrebne pakete
 ### Definiramo funckijo, ki nam nakljucno doloci koordinate tock
@@ -39,7 +39,7 @@ def ali_je_sosed(kandidat, tocka, tocke, radij, dict_sosedov):
     return dict_sosedov
 
 ### Dolocimo funckijo, ki nam narise tocke
-def za_risanje_tock(n,tocke, dict_sosedov, korak_slike):
+def za_risanje_tock(n,tocke, dict_sosedov, korak_slike, ze_poznane_slike):
     for k, (x, y, koliko_dni_se_kuzna, ze_prebolela) in tocke.items():
         if ze_prebolela == 1:
             plt.plot(x, y, 'o', color="blue")
@@ -52,8 +52,13 @@ def za_risanje_tock(n,tocke, dict_sosedov, korak_slike):
                 else:
                     plt.plot(x, y, 'o', color="black")
     plt.suptitle("slika na {} koraku".format(korak_slike))
-    plt.show()
-    #c.show()
+    korak_slike = io.BytesIO()
+    plt.savefig(korak_slike, format="png")
+    korak_slike.seek(0)
+    string = base64.b64encode(korak_slike.read())
+    uri = 'data:image/png;base64,' + urllib.parse.quote(string)
+    ze_poznane_slike.update({korak_slike:uri})
+    return ze_poznane_slike
 
 def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
     ### Najprej dediniram slovar sosedov, in zapisem, da nobena tocka ni sosed od kere okuzene
@@ -61,19 +66,19 @@ def narisi_m_okuzenih_tock(n, m, tocke, T, radij):
     for i in range(0,n):
         dict_sosedov.update({i:[]})
     for i in range(0,m):
-        ### Izberem neko nakljucno okuzeno tocko, in nastavim da bo kuzna se T-1 dni 
+        ### Izberem neko nakljucno okuzeno tocko, in nastavim da bo kuzna se T dni 
         okuzena_tocka = random.randrange(n)
         tocke[okuzena_tocka][2] = T
         for j in range(0,n):
             ### Za vse tocke preverim, ali so sosedi okuzene tocke
             dict_sosedov = ali_je_sosed(j, okuzena_tocka, tocke, radij, dict_sosedov)
     ### Narisem prvo stanje
-    #za_risanje_tock(n, tocke, dict_sosedov, 1)
-    return tocke, dict_sosedov
+    ze_poznane_slike = za_risanje_tock(n, tocke, dict_sosedov, 1, {})
+    return tocke, dict_sosedov, ze_poznane_slike
 
 def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, radij, koraki_do_slike, ali_risem_slike):
     tocke = generiraj_n_tock(n)
-    tocke, dict_sosedov = narisi_m_okuzenih_tock(n, koliko_zacetnih_okuzenih, tocke, T, radij)
+    tocke, dict_sosedov, ze_poznane_slike = narisi_m_okuzenih_tock(n, koliko_zacetnih_okuzenih, tocke, T, radij)
     koraki = 0
     while max_st_ponovitev > 0:
         max_st_ponovitev -= 1
@@ -114,7 +119,7 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
 
                     ### Na koncu se popravimo, koliko dni bo se kuzna.
                     tocke[k][2] -= 1
-                ### Na stevilo_trenutno_bolnih nam šteje število okuženih točk
+                ### stevilo_trenutno_bolnih nam šteje število okuženih točk
                 if koliko_dni_se_kuzna > 1:
                     stevilo_trenutno_bolnih +=1
                 ### Preboleli je število prebolelih
@@ -126,7 +131,7 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
         if ali_risem_slike:
             if koraki % koraki_do_slike == 0:
                 print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, stevilo_trenutno_bolnih, preboleli))
-                za_risanje_tock(n, tocke, dict_sosedov, koraki)
+                ze_poznane_slike = za_risanje_tock(n, tocke, dict_sosedov, koraki, ze_poznane_slike)
 
             if koraki % 10 == 0:
                 print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, stevilo_trenutno_bolnih, preboleli))
@@ -134,13 +139,13 @@ def okuzi_sosede(n, koliko_zacetnih_okuzenih, verjetnost, T, max_st_ponovitev, r
             if (stevilo_trenutno_bolnih)/n == 1:
                 print("stevilo okuzenih pri {0} koraku je: {1}".format(koraki, stevilo_trenutno_bolnih))
                 print("Delez okuzenih je: {}".format(stevilo_trenutno_bolnih/n))
-                za_risanje_tock(n, tocke, dict_sosedov, koraki)
-                break
+                ze_poznane_slike = za_risanje_tock(n, tocke, dict_sosedov, koraki, ze_poznane_slike)
+                return(ze_poznane_slike)
 
             if (stevilo_trenutno_bolnih)/n == 0:
                 print("stevilo okuzenih pri {0} koraku je: {1}, zdravih pa {2}".format(koraki, stevilo_trenutno_bolnih, preboleli))
-                za_risanje_tock(n, tocke, dict_sosedov, koraki)
-                break
+                ze_poznane_slike = za_risanje_tock(n, tocke, dict_sosedov, koraki, ze_poznane_slike)
+                return(ze_poznane_slike)
        ### Če ne želimo da riše slike, tukaj nadaljuje:
         if (stevilo_trenutno_bolnih)/n == 1:
             return (stevilo_trenutno_bolnih, preboleli, koraki)
@@ -173,8 +178,10 @@ def generiraj():
 
 
 #tocke = generiraj_n_tock(2000)
-### TESTI
-#narisi_m_okuzenih_tock(2000, 1, tocke, 10, 0.2)
+#### TESTI
+#a,b,c = narisi_m_okuzenih_tock(2000, 1, tocke, 10, 0.2)
+#for i,v in c.items():
+#    print(v)
 #b = narisi_m_okuzenih_tock(200, 2, tocke, 10, 0.2)
 #
 #b = okuzi_sosede(2000, 1, 0.01, 14, 1000, 0.05, 2)
